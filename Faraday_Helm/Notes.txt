@@ -1,0 +1,32 @@
+Created this helm chart to run locally on Minikube
+# Start Minikube 
+minikube start
+
+# Create the faraday namespace
+kubectl create namespace faraday
+
+#Install the Helm chart
+helm install Faraday_Helm -n faraday
+
+# Check status
+kubectl get pods -n faraday
+
+# Check if pods are running
+kubectl get pods -n faraday
+
+# Check services
+kubectl get svc -n faraday
+
+# Port-forward to access the service
+kubectl port-forward -n faraday svc/faraday-app 5985:5985
+
+# Node details
+kubectl get nodes -o wide
+
+# review the logs 
+kubectl logs -n faraday faraday-app-774fd8bddb-v8cbz
+
+# Pod description
+kubectl describe pod -n faraday faraday-app-774fd8bddb-v8cbz
+# Helm chart upgrade
+helm upgrade faraday Faraday_Helm -n faraday
