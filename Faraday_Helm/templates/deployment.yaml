@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-app
+  labels:
+    app: {{ .Release.Name }}-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-app
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-app
+    spec:
+      containers:
+        - name: faraday
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/entrypoint.sh"]
+          ports:
+            - containerPort: 5985
+          env:
+            - name: PGSQL_USER
+              value: {{ .Values.db.env.POSTGRES_USER }}
+            - name: PGSQL_PASSWD
+              value: {{ .Values.db.env.POSTGRES_PASSWORD }}
+            - name: PGSQL_HOST
+              value: {{ .Release.Name }}-db
+            - name: PGSQL_DBNAME
+              value: {{ .Values.db.env.POSTGRES_DB }}
+            - name: REDIS_SERVER
+              value: {{ .Release.Name }}-redis
+          {{- if .Values.persistence.enabled }}
+          volumeMounts:
+            - name: faraday-data
+              mountPath: {{ .Values.persistence.mountPath }}
+          {{- end }}
+      {{- if .Values.persistence.enabled }}
+      volumes:
+        - name: faraday-data
+          persistentVolumeClaim:
+            claimName: {{ .Release.Name }}-faraday-data
+      {{- end }}

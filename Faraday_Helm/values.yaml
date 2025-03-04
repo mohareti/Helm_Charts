@@ -1,0 +1,40 @@
+image:
+  repository: faradaysec/faraday
+  tag: "5.11.0"  # Use a specific version
+  pullPolicy: Always  # Force pull the new image
+
+db:
+  image:
+    repository: postgres
+    tag: 12.7-alpine
+    pullPolicy: IfNotPresent
+  persistence:
+    enabled: true
+    size: 8Gi
+    storageClass: ""
+  env:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_DB: faraday
+
+redis:
+  image:
+    repository: redis
+    tag: 6.2-alpine
+    pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 5985
+
+persistence:
+  enabled: true
+  accessMode: ReadWriteOnce
+  size: 1Gi
+  mountPath: /home/faraday/.faraday
+  hostPath: "$HOME/.faraday"
+
+# Add to values.yaml:
+app:
+  initContainers: true  # Add init containers to wait for DB and Redis
+  debug: true  # Enable debug logging
